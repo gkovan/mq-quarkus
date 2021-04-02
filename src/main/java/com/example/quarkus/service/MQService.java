@@ -18,8 +18,8 @@ public class MQService {
 	}
 
 
-	//@Inject
-	//private MyJMSTemplate jmsTemplate;
+    @Inject
+	private MyJMSTemplate jmsTemplate;
 	
 	
 	public void sendHelloWorld() {
@@ -27,7 +27,7 @@ public class MQService {
 		final Logger LOG = LoggerFactory.getLogger(MQService.class);
 
 		try {
-			MyJMSTemplate jmsTemplate = new MyJMSTemplate();
+			//MyJMSTemplate jmsTemplate = new MyJMSTemplate();
 			String helloWorld = "Hello World!";
 			jmsTemplate.send();
 			//jmsTemplate.convertAndSend("DEV.QUEUE.1", helloWorld);

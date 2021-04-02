@@ -1,5 +1,7 @@
 package com.example.quarkus.service;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import javax.jms.Destination;
 import javax.jms.JMSConsumer;
 import javax.jms.JMSContext;
@@ -7,63 +9,101 @@ import javax.jms.JMSException;
 import javax.jms.JMSProducer;
 import javax.jms.TextMessage;
 
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+
 import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jms.JmsFactoryFactory;
 import com.ibm.msg.client.wmq.WMQConstants;
 
-public class MyJMSTemplate {
+@ApplicationScoped
+final public class MyJMSTemplate {
 
 	// System exit status value (assume unset value to be 1)
 	private static int status = 1;
+	
+    @Inject
+    @ConfigProperty(name = "mq.host")
+    private static String mqHostname;
 
-	// Create variables for the connection to MQ
-	private static final String HOST = "localhost"; // Host name or IP address
-	private static final int PORT = 1414; // Listener port for your queue manager
-	private static final String CHANNEL = "DEV.APP.SVRCONN"; // Channel name
-	private static final String QMGR = "QM1"; // Queue manager name
-	private static final String APP_USER = "app"; // User name that application uses to connect to MQ
-	private static final String APP_PASSWORD = "passw0rd"; // Password that the application uses to connect to MQ
-	private static final String QUEUE_NAME = "DEV.QUEUE.1"; // Queue that the application uses to put and get messages
-															// to and from
+    @Inject
+    @ConfigProperty(name = "mq.port")
+    private static int mqHostport;
 
-	public static void send() {
+    @Inject
+    @ConfigProperty(name = "mq.qmgr", defaultValue = "QM1")
+    private static String mqQmgr;
 
+    @Inject
+    @ConfigProperty(name = "mq.channel", defaultValue = "DEV.APP.SVRCONN")
+    private static String mqChannel;
+
+    @Inject
+    @ConfigProperty(name = "mq.app_user", defaultValue = "app")
+    private static String mqAppUser;
+
+    @Inject
+    @ConfigProperty(name = "mq.app_password", defaultValue = "passw0rd")
+    private static String mqPassword;
+
+    @Inject
+    @ConfigProperty(name = "mq.queue_name", defaultValue = "DEV.QUEUE.1")
+    private static String mqQueueName;
+
+    @Inject
+    @ConfigProperty(name = "app.name", defaultValue = "TestApp")
+    private static String appName;
+
+    
+
+    
+	public MyJMSTemplate() {
+		super();
+		// TODO Auto-generated constructor stub
+		// Create a connection factory
+		
+
+		
+	}
+	
+	public void send() {
+		
+	     JmsFactoryFactory ff;
+	     JmsConnectionFactory cf = null;
+	    
+		// Variables
+		JMSContext context = null;
+		Destination destination = null;
+		JMSProducer producer = null;
+		JMSConsumer consumer = null;
+		
 		try {
-			// Variables
-			JMSContext context = null;
-			Destination destination = null;
-			JMSProducer producer = null;
-			JMSConsumer consumer = null;
-
-			// Create a connection factory
-			JmsFactoryFactory ff = JmsFactoryFactory.getInstance(WMQConstants.WMQ_PROVIDER);
-			JmsConnectionFactory cf = ff.createConnectionFactory();
-
+			ff = JmsFactoryFactory.getInstance(WMQConstants.WMQ_PROVIDER);
+			cf = ff.createConnectionFactory();
 			// Set the properties
-			cf.setStringProperty(WMQConstants.WMQ_HOST_NAME, HOST);
-			cf.setIntProperty(WMQConstants.WMQ_PORT, PORT);
-			cf.setStringProperty(WMQConstants.WMQ_CHANNEL, CHANNEL);
+			cf.setStringProperty(WMQConstants.WMQ_HOST_NAME, mqHostname);
+			cf.setIntProperty(WMQConstants.WMQ_PORT, mqHostport);
+			cf.setStringProperty(WMQConstants.WMQ_CHANNEL, mqChannel);
 			cf.setIntProperty(WMQConstants.WMQ_CONNECTION_MODE, WMQConstants.WMQ_CM_CLIENT);
-			cf.setStringProperty(WMQConstants.WMQ_QUEUE_MANAGER, QMGR);
+			cf.setStringProperty(WMQConstants.WMQ_QUEUE_MANAGER, mqQmgr);
 			cf.setStringProperty(WMQConstants.WMQ_APPLICATIONNAME, "JmsPutGet (JMS)");
 			cf.setBooleanProperty(WMQConstants.USER_AUTHENTICATION_MQCSP, true);
-			cf.setStringProperty(WMQConstants.USERID, APP_USER);
-			cf.setStringProperty(WMQConstants.PASSWORD, APP_PASSWORD);
-			
-			// Create JMS objects
-			context = cf.createContext();
-			destination = context.createQueue("queue:///" + QUEUE_NAME);
+			cf.setStringProperty(WMQConstants.USERID, mqAppUser);
+			cf.setStringProperty(WMQConstants.PASSWORD, mqPassword);
 
-			long uniqueNumber = System.currentTimeMillis() % 1000;
-			TextMessage message = context.createTextMessage("Your lucky number today is " + uniqueNumber);
-
-			producer = context.createProducer();
-			producer.send(destination, message);
-			System.out.println("Sent message:\n" + message);
-
-		} catch (JMSException jmsex) {
-			 recordFailure(jmsex);
+		} catch (JMSException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+		// Create JMS objects
+		context = cf.createContext();
+		producer = context.createProducer();
+		destination = context.createQueue("queue:///" + mqQueueName);
+
+		long uniqueNumber = System.currentTimeMillis() % 1000;
+		TextMessage message = context.createTextMessage("Your lucky number today is " + uniqueNumber);
+		producer.send(destination, message);
+		System.out.println("Sent message:\n" + message);
 	}
 	
 	/**

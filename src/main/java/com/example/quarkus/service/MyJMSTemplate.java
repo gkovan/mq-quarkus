@@ -20,7 +20,7 @@ final public class MyJMSTemplate {
 
 	// System exit status value (assume unset value to be 1)
 	private static int status = 1;
-	
+
     @Inject
     @ConfigProperty(name = "mq.host")
     private static String mqHostname;
@@ -60,9 +60,6 @@ final public class MyJMSTemplate {
 		super();
 		// TODO Auto-generated constructor stub
 		// Create a connection factory
-		
-
-		
 	}
 	
 	public void send() {

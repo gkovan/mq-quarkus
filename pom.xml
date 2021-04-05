@@ -72,6 +72,9 @@
 						</goals>
 					</execution>
 				</executions>
+				<configuration>
+				   <jvmArgs>-DHOST=localhost -DPORT=1414 -DCHANNEL=DEV.APP.SVRCONN -DQM=QM1 -DUSER=app -DPASSWORD=passw0rd -DQUEUE_NAME=DEV.QUEUE.1</jvmArgs>
+				</configuration>
 			</plugin>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>

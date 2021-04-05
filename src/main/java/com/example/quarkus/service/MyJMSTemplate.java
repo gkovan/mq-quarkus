@@ -22,11 +22,11 @@ final public class MyJMSTemplate {
 	private static int status = 1;
 
     @Inject
-    @ConfigProperty(name = "mq.host")
+    @ConfigProperty(name = "mq.host", defaultValue = "localhost")
     private static String mqHostname;
 
     @Inject
-    @ConfigProperty(name = "mq.port")
+    @ConfigProperty(name = "mq.port", defaultValue = "1414")
     private static int mqHostport;
 
     @Inject

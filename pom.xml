@@ -37,6 +37,10 @@
 			<artifactId>quarkus-resteasy</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-resteasy-jackson</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>com.ibm.mq</groupId>
 			<artifactId>mq-jms-spring-boot-starter</artifactId>
 			<version>2.4.3</version>
@@ -73,7 +77,7 @@
 					</execution>
 				</executions>
 				<configuration>
-				   <jvmArgs>-DHOST=localhost -DPORT=1414 -DCHANNEL=DEV.APP.SVRCONN -DQM=QM1 -DUSER=app -DPASSWORD=passw0rd -DQUEUE_NAME=DEV.QUEUE.1</jvmArgs>
+					<jvmArgs>-DHOST=localhost -DPORT=1414 -DCHANNEL=DEV.APP.SVRCONN -DQM=QM1 -DUSER=app -DPASSWORD=passw0rd -DQUEUE_NAME=DEV.QUEUE.1</jvmArgs>
 				</configuration>
 			</plugin>
 			<plugin>

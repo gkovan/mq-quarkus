@@ -21,59 +21,95 @@ final public class MyJMSTemplate {
 	// System exit status value (assume unset value to be 1)
 	private static int status = 1;
 
-    @Inject
-    @ConfigProperty(name = "mq.host", defaultValue = "localhost")
-    private static String mqHostname;
+	@Inject
+	@ConfigProperty(name = "mq.host", defaultValue = "localhost")
+	private static String mqHostname;
 
-    @Inject
-    @ConfigProperty(name = "mq.port", defaultValue = "1414")
-    private static int mqHostport;
+	@Inject
+	@ConfigProperty(name = "mq.port", defaultValue = "1414")
+	private static int mqHostport;
 
-    @Inject
-    @ConfigProperty(name = "mq.qmgr", defaultValue = "QM1")
-    private static String mqQmgr;
+	@Inject
+	@ConfigProperty(name = "mq.qmgr", defaultValue = "QM1")
+	private static String mqQmgr;
 
-    @Inject
-    @ConfigProperty(name = "mq.channel", defaultValue = "DEV.APP.SVRCONN")
-    private static String mqChannel;
+	@Inject
+	@ConfigProperty(name = "mq.channel", defaultValue = "DEV.APP.SVRCONN")
+	private static String mqChannel;
 
-    @Inject
-    @ConfigProperty(name = "mq.app_user", defaultValue = "app")
-    private static String mqAppUser;
+	@Inject
+	@ConfigProperty(name = "mq.app_user", defaultValue = "app")
+	private static String mqAppUser;
 
-    @Inject
-    @ConfigProperty(name = "mq.app_password", defaultValue = "passw0rd")
-    private static String mqPassword;
+	@Inject
+	@ConfigProperty(name = "mq.app_password", defaultValue = "passw0rd")
+	private static String mqPassword;
 
-    @Inject
-    @ConfigProperty(name = "mq.queue_name", defaultValue = "DEV.QUEUE.1")
-    private static String mqQueueName;
+	@Inject
+	@ConfigProperty(name = "mq.queue_name", defaultValue = "DEV.QUEUE.1")
+	private static String mqQueueName;
 
-    @Inject
-    @ConfigProperty(name = "app.name", defaultValue = "TestApp")
-    private static String appName;
+	@Inject
+	@ConfigProperty(name = "app.name", defaultValue = "TestApp")
+	private static String appName;
 
-    
-
-    
 	public MyJMSTemplate() {
 		super();
 		// TODO Auto-generated constructor stub
 		// Create a connection factory
 	}
-	
-	public void send() {
-		
-	     JmsFactoryFactory ff;
-	     JmsConnectionFactory cf = null;
-	    
-		// Variables
+
+	public void send(String strToSend) throws JMSException {
 		JMSContext context = null;
 		Destination destination = null;
 		JMSProducer producer = null;
+
+		try {
+			JmsConnectionFactory cf = getJMSConectionFactory();
+
+			// Create JMS objects
+			context = cf.createContext();
+			producer = context.createProducer();
+			destination = context.createQueue("queue:///" + mqQueueName);
+
+			TextMessage message = context.createTextMessage(strToSend);
+			producer.send(destination, message);
+			System.out.println("Sent message:\n" + message);
+
+		} catch (Throwable e) {
+			e.printStackTrace();
+			throw (e);
+		}
+	}
+
+	public String receiveMessage() throws JMSException {		
+		JMSContext context = null;
+		Destination destination = null;
 		JMSConsumer consumer = null;
 		
 		try {
+			JmsConnectionFactory cf = getJMSConectionFactory();
+
+			// Create JMS objects
+			context = cf.createContext();
+			destination = context.createQueue("queue:///" + mqQueueName);
+			consumer = context.createConsumer(destination); // autoclosable
+			
+			
+			String receivedMessage = consumer.receiveBody(String.class, 15000); // in ms or 15 seconds
+			System.out.println("\nReceived message:\n" + receivedMessage);
+			return receivedMessage;
+		} catch (Throwable e) {
+			e.printStackTrace();
+			throw (e);
+		}
+	}
+
+	private JmsConnectionFactory getJMSConectionFactory() throws JMSException {
+		try {
+			JmsFactoryFactory ff;
+			JmsConnectionFactory cf = null;
+
 			ff = JmsFactoryFactory.getInstance(WMQConstants.WMQ_PROVIDER);
 			cf = ff.createConnectionFactory();
 			// Set the properties
@@ -86,23 +122,13 @@ final public class MyJMSTemplate {
 			cf.setBooleanProperty(WMQConstants.USER_AUTHENTICATION_MQCSP, true);
 			cf.setStringProperty(WMQConstants.USERID, mqAppUser);
 			cf.setStringProperty(WMQConstants.PASSWORD, mqPassword);
-
-		} catch (JMSException e) {
-			// TODO Auto-generated catch block
+			return cf;
+		} catch (Throwable e) {
 			e.printStackTrace();
+			throw (e);
 		}
-		
-		// Create JMS objects
-		context = cf.createContext();
-		producer = context.createProducer();
-		destination = context.createQueue("queue:///" + mqQueueName);
-
-		long uniqueNumber = System.currentTimeMillis() % 1000;
-		TextMessage message = context.createTextMessage("Your lucky number today is " + uniqueNumber);
-		producer.send(destination, message);
-		System.out.println("Sent message:\n" + message);
 	}
-	
+
 	/**
 	 * Record this run as successful.
 	 */
@@ -111,7 +137,7 @@ final public class MyJMSTemplate {
 		status = 0;
 		return;
 	}
-	
+
 	/**
 	 * Record this run as failure.
 	 *
@@ -129,7 +155,7 @@ final public class MyJMSTemplate {
 		status = -1;
 		return;
 	}
-	
+
 	/**
 	 * Process a JMSException and any associated inner exceptions.
 	 *

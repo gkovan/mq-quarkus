@@ -2,18 +2,18 @@ package com.example.quarkus.model;
 
 public class ResponseData {
 	
-	public ResponseData(String status, String message, String body) {
+	public ResponseData(String status, String statusMessage, String data) {
 		super();
 		this.status = status;
-		this.message = message;
-		this.body = body;
+		this.statusMessage = statusMessage;
+		this.data = data;
 	}
 
 	private String status;
     
-    private String message;
+    private String statusMessage;
     
-    private String body;
+    private String data;
 
 	public String getStatus() {
 		return status;
@@ -23,19 +23,19 @@ public class ResponseData {
 		this.status = status;
 	}
 
-	public String getMessage() {
-		return message;
+	public String getStatusMessage() {
+		return statusMessage;
 	}
 
-	public void setMessage(String message) {
-		this.message = message;
+	public void setStatusMessage(String message) {
+		this.statusMessage = message;
 	}
 
-	public String getBody() {
-		return body;
+	public String getData() {
+		return data;
 	}
 
-	public void setBody(String body) {
-		this.body = body;
+	public void setData(String body) {
+		this.data = body;
 	}
 }

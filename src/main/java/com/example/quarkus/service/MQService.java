@@ -27,7 +27,7 @@ public class MQService {
 	private MyJMSTemplate jmsTemplate;
 	
 	
-	public void sendHelloWorld() {
+	public String sendHelloWorld() {
 		
 		final Logger LOG = LoggerFactory.getLogger(MQService.class);
 
@@ -35,6 +35,7 @@ public class MQService {
 			String helloWorld = "Hello World!";
 			jmsTemplate.send(helloWorld);
 			LOG.debug("Successfully Sent message: {} to the queue", helloWorld);
+			return helloWorld;
 		} catch (JMSException ex) {
 			throw new AppException("MQAPP001", "Error sending message to the queue.", ex);
 		}
@@ -56,13 +57,12 @@ public class MQService {
 			jsonResult = mapper.writerWithDefaultPrettyPrinter()
 			  .writeValueAsString(requestMap);
 		    jmsTemplate.send(jsonResult);
+			return jsonResult;
 		} catch (JsonProcessingException e) {
 			throw new AppException("MQAPP003", "Error processing json request.", e);
 		} catch(JMSException ex) {
 			throw new AppException("MQAPP001", "Error sending message to the queue.", ex);
-	    }
-		
-		return jsonResult;		
+	    }		
 	}	
 
 }

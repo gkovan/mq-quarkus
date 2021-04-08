@@ -3,6 +3,7 @@ package com.example.quarkus;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -27,8 +28,8 @@ public class MQClientApp {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseData sendHelloWorld() {
-    	mqService.sendHelloWorld();
-    	ResponseData responseData = new ResponseData("OK", "Successfully sent record to MQ", "");
+    	String dataSentToQueue = mqService.sendHelloWorld();
+    	ResponseData responseData = new ResponseData("OK", "Successfully sent record to MQ", dataSentToQueue);
         return responseData;
     }
     
@@ -36,17 +37,18 @@ public class MQClientApp {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public ResponseData recv() {
-    	String bodyOfMessage = mqService.receiveMessage();
-    	ResponseData responseData = new ResponseData("OK", "Successfully received record", bodyOfMessage);
+    	String dataReceivedFromQueue = mqService.receiveMessage();
+    	ResponseData responseData = new ResponseData("OK", "Successfully received record", dataReceivedFromQueue);
     	return responseData;
     }
     
     @Path("/send-json")
     @POST
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
 	public ResponseData sendPost(Map<String,Object> requestMap) {
-	       String bodyOfMessage = mqService.sendJson(requestMap);
-	       ResponseData responseData = new ResponseData("OK", "Successfully received record", bodyOfMessage);
+	       String dataSentToQueue = mqService.sendJson(requestMap);
+	       ResponseData responseData = new ResponseData("OK", "Successfully received record", dataSentToQueue);
 	       return responseData;
-		}
+	}
 }

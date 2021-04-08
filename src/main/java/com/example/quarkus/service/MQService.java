@@ -26,10 +26,10 @@ public class MQService {
     @Inject
 	private MyJMSTemplate jmsTemplate;
 	
+    final Logger LOG = LoggerFactory.getLogger(MQService.class);
 	
 	public String sendHelloWorld() {
 		
-		final Logger LOG = LoggerFactory.getLogger(MQService.class);
 
 		try {
 			String helloWorld = "Hello World!";
@@ -43,7 +43,9 @@ public class MQService {
 	
 	public String receiveMessage() {
 	    try{
-	        return jmsTemplate.receiveMessage();
+	    	String receivedMsg = jmsTemplate.receiveMessage();
+	    	LOG.debug("Successfully received message: {} to the queue", receivedMsg);
+	        return receivedMsg;
 	    }catch(JMSException ex) {
 	    	throw new AppException("MQAPP002", "Error receiving message from the queue.", ex);
 	    }
@@ -57,6 +59,7 @@ public class MQService {
 			jsonResult = mapper.writerWithDefaultPrettyPrinter()
 			  .writeValueAsString(requestMap);
 		    jmsTemplate.send(jsonResult);
+		    LOG.debug("Successfully Sent message:\n {} \n to the queue", jsonResult);
 			return jsonResult;
 		} catch (JsonProcessingException e) {
 			throw new AppException("MQAPP003", "Error processing json request.", e);

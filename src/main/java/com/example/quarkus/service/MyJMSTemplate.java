@@ -10,6 +10,8 @@ import javax.jms.JMSProducer;
 import javax.jms.TextMessage;
 
 import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jms.JmsFactoryFactory;
@@ -53,6 +55,8 @@ final public class MyJMSTemplate {
 	@ConfigProperty(name = "app.name", defaultValue = "TestApp")
 	private static String appName;
 
+	final Logger LOG = LoggerFactory.getLogger(MyJMSTemplate.class);
+	
 	public MyJMSTemplate() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -74,7 +78,7 @@ final public class MyJMSTemplate {
 
 			TextMessage message = context.createTextMessage(strToSend);
 			producer.send(destination, message);
-			System.out.println("Sent message:\n" + message);
+			LOG.debug("Sent message:\n {}", message);
 
 		} catch (Throwable e) {
 			e.printStackTrace();
@@ -97,7 +101,7 @@ final public class MyJMSTemplate {
 			
 			
 			String receivedMessage = consumer.receiveBody(String.class, 15000); // in ms or 15 seconds
-			System.out.println("\nReceived message:\n" + receivedMessage);
+			LOG.debug("\nReceived message:\n {}", receivedMessage);
 			return receivedMessage;
 		} catch (Throwable e) {
 			e.printStackTrace();

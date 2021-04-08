@@ -41,13 +41,17 @@
 			<artifactId>quarkus-resteasy-jackson</artifactId>
 		</dependency>
 		<dependency>
-        	<groupId>com.ibm.mq</groupId>
-        	<artifactId>com.ibm.mq.allclient</artifactId>
-        	<version>9.2.1.0</version>
-    	</dependency>
+			<groupId>com.ibm.mq</groupId>
+			<artifactId>com.ibm.mq.allclient</artifactId>
+			<version>9.2.1.0</version>
+		</dependency>
 		<dependency>
 			<groupId>io.quarkus</groupId>
 			<artifactId>quarkus-arc</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>io.quarkus</groupId>
+			<artifactId>quarkus-smallrye-health</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.quarkus</groupId>
